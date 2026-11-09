@@ -1,0 +1,32 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Vadim Nevinskiy",email = "vadim_nevinskiy@mail.ru"}
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi (>=0.162.2,<0.163.0)",
+    "sqlalchemy[asyncio] (>=2.1.8,<3.0.0)",
+    "asyncpg (>=0.32.0,<0.33.0)",
+    "pydantic[email] (>=2.14.3,<3.0.0)",
+    "pydantic-settings (>=2.16.2,<3.0.0)",
+    "uvicorn (>=0.54.0,<0.55.0)",
+    "psycopg[binary] (>=3.3.8,<4.0.0)",
+    "alembic (>=1.20.1,<2.0.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[dependency-groups]
+dev = [
+    "black (>=26.10.1,<27.0.0)",
+    "pytest (>=9.2.0,<10.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
