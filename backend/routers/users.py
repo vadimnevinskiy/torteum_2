@@ -17,7 +17,7 @@ async def get_users(db: AsyncSession = Depends(db_helper.get_db)) -> list[UserRe
     return [UserResponse.model_validate(user) for user in users]
 
 
-@router.get("/{user_id}", response_model=list[UserResponse])
+@router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
     user_id: int,
     db: AsyncSession = Depends(db_helper.get_db),

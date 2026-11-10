@@ -7,8 +7,6 @@ class User(BaseModel):
     last_name: str | None
     email: str
 
-    model_config = {"from_attributes": True}
-
 
 class UserCreate(User):
     password_hash: str
@@ -18,3 +16,5 @@ class UserResponse(User):
     id: int
     created_at: datetime
     updated_at: datetime
+
+    model_config = {"from_attributes": True}
