@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from fastapi import APIRouter, HTTPException, Depends, status
-from schemas import UserCreate, UserResponse
+from schemas import UserCreate, UserResponse, UserUpdate
 from models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from db import db_helper
@@ -47,4 +47,21 @@ async def user_create(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str(exc_required_field),
+        )
+
+
+@router.patch("/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: int, new_user: UserUpdate, db: AsyncSession = Depends(db_helper.get_db)
+) -> UserResponse:
+    # TODO Убрать проверку на обязательные поля, для обновления все поля не обязательны!
+    try:
+        user: User = await user_service.get_user(user_id, db)
+        updated_user = await user_service.update_user(new_user, user, db)
+        return UserResponse.model_validate(updated_user)
+    except RequiredFiledError as exc_required_field:
+        print(f"------------------------------!!!!------------------------")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str("ОШИБКА!!!!!!!!!!!"),
         )

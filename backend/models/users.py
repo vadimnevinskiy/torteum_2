@@ -27,3 +27,14 @@ class User(Base):
         onupdate=func.now(),
         nullable=False,
     )
+
+    def __repr__(self) -> str:
+        return (
+            f"<User id={self.id} "
+            f"first_name={self.first_name} "
+            f"last_name={self.last_name} "
+            f"email={self.email} "
+            f"password_hash={self.password_hash} "
+            f"created_at={self.created_at} "
+            f"updated_at={self.updated_at}>"
+        )

@@ -6,7 +6,7 @@ from dto import ResponseMessage
 
 
 async def get_users(db: AsyncSession) -> Sequence[User]:
-    sql_query = select(User)
+    sql_query = select(User).order_by(User.created_at.asc())
     result = await db.scalars(sql_query)
 
     users: Sequence[User] = result.all()
