@@ -3,6 +3,8 @@ from datetime import datetime
 
 
 class User(BaseModel):
+    # для того чтобы кастомизировать ошибки, сделал допуск None для обязательных полей,
+    # но нужно принять архитектурное решение и убрать такой допуск
     first_name: str | None
     last_name: str | None
     email: EmailStr | None
