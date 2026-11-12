@@ -64,8 +64,6 @@ async def update_user(new_user: UserUpdate, user: User, db: AsyncSession) -> Use
 
     # Если ключ "first_name" есть в словаре и значение не None тогда запишем его в базу
     # Если ключа нет в словале, pydantic подставит None, но None не пропустим для записи
-    # TODO Сделать проверку на пустые строки, в такой реализации
-    #  пройдет запрос с first_name="" т.к. пустая строка не является None - Решено!
     if (
         "first_name" in data
         and new_user.first_name is not None
@@ -74,10 +72,10 @@ async def update_user(new_user: UserUpdate, user: User, db: AsyncSession) -> Use
         setattr(user, "first_name", new_user.first_name.strip())
 
     # Аналогично с "first_name", пустое не пропустим для записи
-    # TODO Проверить наличие такого email у других пользователей,
-    #  чтобы под зарегистрированным email не могли зарегистрироваться повторно
     if "email" in data and new_user.email is not None and new_user.email.strip() != "":
-        setattr(user, "email", new_user.email.strip())
+        email = new_user.email.strip()
+        await _check_email_exists(email, user, db)  # Проверить Email на уникальность
+        setattr(user, "email", email)
 
     # Аналогично с "first_name", пустое не пропустим для записи
     if (
@@ -86,8 +84,6 @@ async def update_user(new_user: UserUpdate, user: User, db: AsyncSession) -> Use
         and new_user.password_hash.strip() != ""
     ):
         setattr(user, "password_hash", new_user.password_hash.strip())
-
-    print(f"user =====2===== {user}")
 
     result: User = await crud_users.update_user(user, db)
     return result
@@ -98,19 +94,14 @@ async def _check_required_fields(new_user: UserCreate) -> bool:
     for name, value in new_user:
         if name in required_fields and value is None:
             raise RequiredFiledError(name)
-
-    # if new_user.email is None:
-    #     print(f"==========email============_check_required_fields===========")
-    #     raise RequiredFiledError("email")
-    #
-    # if new_user.password_hash is None:
-    #     print(f"==========password_hash============_check_required_fields==========")
-    #     raise RequiredFiledError("password")
-    #
-    # if new_user.first_name is None:
-    #     print(f"==========first_name============_check_required_fields==========")
-    #     raise RequiredFiledError("first_name")
     return True
+
+
+async def _check_email_exists(email: str, user: User, db: AsyncSession):
+    exists_user: User | None = await crud_users.get_user_by_email(email, db)
+
+    if exists_user is not None and exists_user.id != user.id:
+        raise UserAlreadyExistsError(email)
 
 
 async def _check_email(new_user: UserCreate, db: AsyncSession) -> bool:
